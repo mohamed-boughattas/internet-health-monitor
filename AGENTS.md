@@ -137,11 +137,11 @@ internet-health-monitor/
 
 ## Bruin Asset Naming Convention
 
-- **Ingestion assets**: `raw.<metric>_<CC>` (e.g., `raw.ipv6_US`, `raw.dnssec_validation_US`, `raw.roa_4_US`, `raw.net_loss_shutdown_US`)
-- **Combined metric transforms**: `transform.<metric>_combined` (e.g., `transform.ipv6_combined`, `transform.roa_combined`)
-- **Joined summary**: `transform.internet_health_summary`
-- **Country rankings**: `transform.country_rankings`
-- **Python enrichment**: `transform.health_scoring`
+The project uses a **medallion architecture** (Bronze/Silver/Gold):
+
+- **Bronze (raw ingestion)**: `raw.<metric>_<CC>` (e.g., `raw.ipv6_US`, `raw.dnssec_validation_US`, `raw.roa_4_US`, `raw.net_loss_shutdown_US`)
+- **Silver (cleansed/staging)**: `staging.<metric>_combined` (e.g., `staging.ipv6_combined`, `staging.https_combined`, `staging.roa_combined`)
+- **Gold (business/marts)**: `marts.<table>` (e.g., `marts.internet_health_summary`, `marts.country_rankings`, `marts.health_scoring`)
 
 ## Data Scale
 
@@ -201,16 +201,17 @@ health_score = (ipv6_score × 0.25) + (https_score × 0.25) + (dnssec_score × 0
 
 - **Location**: `data/internet_health.db`
 - **Gitignored**: Yes (contains production data)
-- **Raw tables**: One per ingestion asset (30 tables total in `raw.*` schema)
-- **Transform tables**:
-  - `transform.ipv6_combined` — UNION of all 5 country IPv6 tables
-  - `transform.https_combined` — UNION of all 5 country HTTPS tables
-  - `transform.dnssec_combined` — UNION of all 5 country DNSSEC tables
-  - `transform.roa_combined` — Merged IPv4+IPv6 ROA per country per date (daily)
-  - `transform.net_loss_combined` — UNION of all 5 country shutdown tables
-  - `transform.internet_health_summary` — LEFT JOIN from monthly IPv6 + monthly aggregates
-  - `transform.country_rankings` — Per-country health scores with 4-metric composite
-  - `transform.health_scoring` — Country-level averages (Python enrichment output)
+- **Bronze (raw)**: One table per ingestion asset (30 tables total in `raw.*` schema)
+- **Silver (staging)**:
+  - `staging.ipv6_combined` — UNION of all 5 country IPv6 tables
+  - `staging.https_combined` — UNION of all 5 country HTTPS tables
+  - `staging.dnssec_combined` — UNION of all 5 country DNSSEC tables
+  - `staging.roa_combined` — Merged IPv4+IPv6 ROA per country per date (daily)
+  - `staging.net_loss_combined` — UNION of all 5 country shutdown tables
+- **Gold (marts)**:
+  - `marts.internet_health_summary` — LEFT JOIN from monthly IPv6 + monthly aggregates
+  - `marts.country_rankings` — Per-country health scores with 4-metric composite
+  - `marts.health_scoring` — Country-level averages (Python enrichment output)
 
 ## Dashboard Pages
 

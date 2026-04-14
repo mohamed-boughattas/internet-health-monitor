@@ -6,13 +6,13 @@ An interactive dashboard for visualizing internet health metrics for 5 countries
 
 This project ingests internet health data from the [Internet Society Pulse API](https://pulse.internetsociety.org/) and transforms it into an interactive web dashboard. It covers 4 scored metrics plus internet shutdown data:
 
-| Metric | Description | Data Frequency |
-|--------|-------------|----------------|
-| **IPv6 Adoption** | Percentage of users who can access the network via IPv6 | Monthly |
-| **HTTPS Adoption** | Percentage of web traffic using encrypted HTTPS connections | Daily |
-| **DNSSEC Validation** | Percentage of TLDs with valid DNSSEC | Daily |
-| **ROA/RPKI** | Route origin authorization coverage (IPv4 + IPv6 average) | Daily |
-| **Net Loss / Shutdown** | Internet shutdown events and GDP impact | Event-based |
+| Metric                  | Description                                                 | Data Frequency |
+| ----------------------- | ----------------------------------------------------------- | -------------- |
+| **IPv6 Adoption**       | Percentage of users who can access the network via IPv6     | Monthly        |
+| **HTTPS Adoption**      | Percentage of web traffic using encrypted HTTPS connections | Daily          |
+| **DNSSEC Validation**   | Percentage of TLDs with valid DNSSEC                        | Daily          |
+| **ROA/RPKI**            | Route origin authorization coverage (IPv4 + IPv6 average)   | Daily          |
+| **Net Loss / Shutdown** | Internet shutdown events and GDP impact                     | Event-based    |
 
 The composite **Health Score** combines IPv6, HTTPS, DNSSEC, and ROA with equal 25% weights. Net loss data is displayed as "Internet Freedom" but is not part of the health score.
 
@@ -20,40 +20,34 @@ The dashboard provides five views: global overview with choropleth map, country 
 
 ## Architecture
 
-```
-Internet Society Pulse API
-           │
-           ▼
-    ┌──────────────┐
-    │  Bruin       │  30 ingestion assets (5 countries × 6 metric types)
-    │  Pipeline    │
-    └──────────────┘
-           │
-           ▼
-    ┌──────────────┐
-    │  DuckDB      │  raw.* → transform.* → dashboard data
-    │  Database    │
-    └──────────────┘
-           │
-           ▼
-     ┌──────────────┐
-     │  Dash       │  Interactive web dashboard (5 pages)
-     │  Dashboard   │
-     └──────────────┘
+```mermaid
+graph LR
+    A["🌐 ISOC Pulse API"] -->|ingestr| B["🥉 Bronze (raw)<br/>30 ingestion tables"]
+    B -->|cleansed, UNIONed| C["🥈 Silver (staging)<br/>5 combined tables"]
+    C -->|monthly aggregation| D["🥇 Gold (marts)<br/>3 business tables"]
+    D -->|queries| E["📊 Dash Dashboard<br/>5 interactive pages"]
+
+    subgraph DuckDB["DuckDB"]
+        B
+        C
+        D
+    end
 ```
 
 ## Tech Stack
 
-| Layer | Tool | Version |
-|-------|------|---------|
-| Pipeline Framework | Bruin | latest |
-| Data Warehouse | DuckDB | >=1.0.0 |
-| Language | Python | 3.12 |
-| Package Manager | uv | latest |
-| Linter/Formatter | ruff | >=0.3.0 |
-| Type Checker | ty | >=0.0.29 |
-| Dashboard | Dash + Plotly | >=2.14.0 / >=5.18.0 |
-| Containerization | Docker + Compose | - |
+| Layer              | Tool             | Version             |
+| ------------------ | ---------------- | ------------------- |
+| Pipeline Framework | Bruin            | latest              |
+| Data Warehouse     | DuckDB           | >=1.0.0             |
+| Language           | Python           | 3.12                |
+| Package Manager    | uv               | latest              |
+| Linter/Formatter   | ruff             | >=0.3.0             |
+| Type Checker       | ty               | >=0.0.29            |
+| Dashboard          | Dash + Plotly    | >=2.14.0 / >=5.18.0 |
+| Task Runner        | just             | latest              |
+| Testing            | pytest           | >=7.4.0             |
+| Containerization   | Docker + Compose | -                   |
 
 ## Quick Commands
 
@@ -92,13 +86,13 @@ just lock                     # Lock dependencies
 
 Data is tracked for 5 countries (the only ones with data in the ISOC Pulse API):
 
-| Code | Country |
-|------|---------|
-| US | United States |
-| DE | Germany |
-| BR | Brazil |
-| IN | India |
-| JP | Japan |
+| Code | Country       |
+| ---- | ------------- |
+| US   | United States |
+| DE   | Germany       |
+| BR   | Brazil        |
+| IN   | India         |
+| JP   | Japan         |
 
 ## Dashboard Pages
 
@@ -116,11 +110,11 @@ Environment variables (set in `.env`):
 cp .env.example .env  # Then add your ISOC_PULSE_TOKEN
 ```
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `ISOC_PULSE_TOKEN` | API token for Internet Society Pulse | Yes |
-| `TELEMETRY_OPTOUT` | Set to `true` to disable Bruin telemetry | No |
-| `INGESTR_DISABLE_TELEMETRY` | Set to `true` to disable ingestr telemetry | No |
+| Variable                    | Description                                | Required |
+| --------------------------- | ------------------------------------------ | -------- |
+| `ISOC_PULSE_TOKEN`          | API token for Internet Society Pulse       | Yes      |
+| `TELEMETRY_OPTOUT`          | Set to `true` to disable Bruin telemetry   | No       |
+| `INGESTR_DISABLE_TELEMETRY` | Set to `true` to disable ingestr telemetry | No       |
 
 ## Prerequisites
 
@@ -171,10 +165,18 @@ just docker-build && just docker-up
 ## Testing
 
 ```bash
-just test
+just test              # Run all 138 tests
+just test-cov          # Run with coverage report (93%)
 ```
 
-Tests cover health scoring calculations (4-metric, 25% each), dashboard components, and query functions.
+| Test File | Tests | Coverage |
+|-----------|-------|----------|
+| `test_health_scoring.py` | Health score formula and SQL validation | `assets/enrichment/` |
+| `test_dashboard.py` | Components, constants, navbar, layouts | `dashboard/` |
+| `test_queries.py` | All 8 DuckDB query functions + edge cases | `dashboard/data/` |
+| `test_chart_functions.py` | Radar, bar, timeseries, distribution charts | `dashboard/layouts/` |
+| `test_layout_errors.py` | Layout error handling (mocked) | `dashboard/layouts/` |
+| `test_app.py` | Dash callbacks, routing, helpers | `dashboard/app.py` |
 
 ## Health Score Calculation
 

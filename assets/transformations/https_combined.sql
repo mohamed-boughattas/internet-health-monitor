@@ -1,6 +1,6 @@
 /* @bruin
 
-name: transform.https_combined
+name: staging.https_combined
 type: duckdb.sql
 materialization:
   type: table

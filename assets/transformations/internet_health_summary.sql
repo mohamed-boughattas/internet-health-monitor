@@ -1,14 +1,14 @@
 /* @bruin
 
-name: transform.internet_health_summary
+name: marts.internet_health_summary
 type: duckdb.sql
 materialization:
   type: table
 depends:
- - transform.ipv6_combined
- - transform.https_combined
- - transform.dnssec_combined
- - transform.roa_combined
+ - staging.ipv6_combined
+ - staging.https_combined
+ - staging.dnssec_combined
+ - staging.roa_combined
 columns:
   - name: date
     type: date
@@ -32,13 +32,13 @@ SELECT
     monthly_https.https_score,
     monthly_dnssec.dnssec_score,
     monthly_roa.roa_score
-FROM transform.ipv6_combined ipv6
+FROM staging.ipv6_combined ipv6
 LEFT JOIN (
     SELECT
         DATE_TRUNC('month', date) AS date,
         country_code,
         AVG(https_score) AS https_score
-    FROM transform.https_combined
+    FROM staging.https_combined
     GROUP BY DATE_TRUNC('month', date), country_code
 ) monthly_https
     ON ipv6.date = monthly_https.date
@@ -48,7 +48,7 @@ LEFT JOIN (
         DATE_TRUNC('month', date) AS date,
         country_code,
         AVG(dnssec_score) AS dnssec_score
-    FROM transform.dnssec_combined
+    FROM staging.dnssec_combined
     GROUP BY DATE_TRUNC('month', date), country_code
 ) monthly_dnssec
     ON ipv6.date = monthly_dnssec.date
@@ -58,7 +58,7 @@ LEFT JOIN (
         DATE_TRUNC('month', date) AS date,
         country_code,
         AVG(roa_score) AS roa_score
-    FROM transform.roa_combined
+    FROM staging.roa_combined
     GROUP BY DATE_TRUNC('month', date), country_code
 ) monthly_roa
     ON ipv6.date = monthly_roa.date

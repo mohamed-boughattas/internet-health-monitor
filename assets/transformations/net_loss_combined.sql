@@ -1,6 +1,6 @@
 /* @bruin
 
-name: transform.net_loss_combined
+name: staging.net_loss_combined
 type: duckdb.sql
 materialization:
   type: table

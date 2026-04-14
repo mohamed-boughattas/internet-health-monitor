@@ -1,11 +1,11 @@
 /* @bruin
 
-name: transform.country_rankings
+name: marts.country_rankings
 type: duckdb.sql
 materialization:
   type: table
 depends:
- - transform.internet_health_summary
+ - marts.internet_health_summary
 columns:
   - name: country_code
     type: varchar
@@ -37,5 +37,5 @@ SELECT
         (COALESCE(dnssec_score, 0) * 0.25) +
         (COALESCE(roa_score, 0) * 0.25)
     ) AS health_score
-FROM transform.internet_health_summary
+FROM marts.internet_health_summary
 ORDER BY country_code, date DESC

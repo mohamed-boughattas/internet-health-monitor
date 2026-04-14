@@ -1,6 +1,6 @@
 /* @bruin
 
-name: transform.ipv6_combined
+name: staging.ipv6_combined
 type: duckdb.sql
 materialization:
   type: table

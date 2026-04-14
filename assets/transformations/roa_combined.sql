@@ -1,6 +1,6 @@
 /* @bruin
 
-name: transform.roa_combined
+name: staging.roa_combined
 type: duckdb.sql
 materialization:
   type: table

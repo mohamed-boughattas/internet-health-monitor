@@ -1,6 +1,6 @@
 /* @bruin
 
-name: transform.dnssec_combined
+name: staging.dnssec_combined
 type: duckdb.sql
 materialization:
   type: table

@@ -51,10 +51,11 @@ def duckdb_test_db():
         conn = duckdb.connect(str(db_path))
 
         conn.execute("CREATE SCHEMA raw")
-        conn.execute("CREATE SCHEMA transform")
+        conn.execute("CREATE SCHEMA staging")
+        conn.execute("CREATE SCHEMA marts")
 
         conn.execute("""
-            CREATE TABLE transform.country_rankings (
+            CREATE TABLE marts.country_rankings (
                 country_code VARCHAR,
                 health_score DOUBLE,
                 ipv6_score DOUBLE,
@@ -73,12 +74,12 @@ def duckdb_test_db():
         ]
         for row in country_data:
             conn.execute(
-                "INSERT INTO transform.country_rankings VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO marts.country_rankings VALUES (?, ?, ?, ?, ?, ?, ?)",
                 row,
             )
 
         conn.execute("""
-            CREATE TABLE transform.https_combined (
+            CREATE TABLE staging.https_combined (
                 date DATE,
                 https_score DOUBLE,
                 country_code VARCHAR
@@ -90,12 +91,12 @@ def duckdb_test_db():
                 https_data.append((date, score, cc))
         for row in https_data:
             conn.execute(
-                "INSERT INTO transform.https_combined VALUES (?, ?, ?)",
+                "INSERT INTO staging.https_combined VALUES (?, ?, ?)",
                 row,
             )
 
         conn.execute("""
-            CREATE TABLE transform.dnssec_combined (
+            CREATE TABLE staging.dnssec_combined (
                 date DATE,
                 dnssec_score DOUBLE,
                 country_code VARCHAR
@@ -107,12 +108,12 @@ def duckdb_test_db():
                 dnssec_data.append((date, score, cc))
         for row in dnssec_data:
             conn.execute(
-                "INSERT INTO transform.dnssec_combined VALUES (?, ?, ?)",
+                "INSERT INTO staging.dnssec_combined VALUES (?, ?, ?)",
                 row,
             )
 
         conn.execute("""
-            CREATE TABLE transform.roa_combined (
+            CREATE TABLE staging.roa_combined (
                 date DATE,
                 roa_score DOUBLE,
                 country_code VARCHAR
@@ -124,12 +125,12 @@ def duckdb_test_db():
                 roa_data.append((date, score, cc))
         for row in roa_data:
             conn.execute(
-                "INSERT INTO transform.roa_combined VALUES (?, ?, ?)",
+                "INSERT INTO staging.roa_combined VALUES (?, ?, ?)",
                 row,
             )
 
         conn.execute("""
-            CREATE TABLE transform.ipv6_combined (
+            CREATE TABLE staging.ipv6_combined (
                 date DATE,
                 ipv6_score DOUBLE,
                 country_code VARCHAR
@@ -144,12 +145,12 @@ def duckdb_test_db():
         ]
         for row in ipv6_data:
             conn.execute(
-                "INSERT INTO transform.ipv6_combined VALUES (?, ?, ?)",
+                "INSERT INTO staging.ipv6_combined VALUES (?, ?, ?)",
                 row,
             )
 
         conn.execute("""
-            CREATE TABLE transform.net_loss_combined (
+            CREATE TABLE staging.net_loss_combined (
                 date DATE,
                 country VARCHAR,
                 duration DOUBLE,
@@ -164,12 +165,12 @@ def duckdb_test_db():
         ]
         for row in net_loss_data:
             conn.execute(
-                "INSERT INTO transform.net_loss_combined VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO staging.net_loss_combined VALUES (?, ?, ?, ?, ?)",
                 row,
             )
 
         conn.execute("""
-            CREATE TABLE transform.internet_health_summary (
+            CREATE TABLE marts.internet_health_summary (
                 date DATE,
                 country_code VARCHAR,
                 ipv6_score DOUBLE,
@@ -188,7 +189,7 @@ def duckdb_test_db():
         ]
         for row in summary_data:
             conn.execute(
-                "INSERT INTO transform.internet_health_summary VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO marts.internet_health_summary VALUES (?, ?, ?, ?, ?, ?, ?)",
                 row,
             )
 
@@ -206,9 +207,10 @@ def duckdb_empty_db():
         db_path = Path(tmpdir) / "test_empty_internet_health.db"
         conn = duckdb.connect(str(db_path))
 
-        conn.execute("CREATE SCHEMA transform")
+        conn.execute("CREATE SCHEMA staging")
+        conn.execute("CREATE SCHEMA marts")
         conn.execute("""
-            CREATE TABLE transform.country_rankings (
+            CREATE TABLE marts.country_rankings (
                 country_code VARCHAR,
                 health_score DOUBLE,
                 ipv6_score DOUBLE,
@@ -219,7 +221,7 @@ def duckdb_empty_db():
             )
         """)
         conn.execute("""
-            CREATE TABLE transform.net_loss_combined (
+            CREATE TABLE staging.net_loss_combined (
                 date DATE,
                 country VARCHAR,
                 duration DOUBLE,
@@ -228,7 +230,7 @@ def duckdb_empty_db():
             )
         """)
         conn.execute("""
-            CREATE TABLE transform.internet_health_summary (
+            CREATE TABLE marts.internet_health_summary (
                 date DATE,
                 country_code VARCHAR,
                 ipv6_score DOUBLE,
@@ -239,28 +241,28 @@ def duckdb_empty_db():
             )
         """)
         conn.execute("""
-            CREATE TABLE transform.https_combined (
+            CREATE TABLE staging.https_combined (
                 date DATE,
                 https_score DOUBLE,
                 country_code VARCHAR
             )
         """)
         conn.execute("""
-            CREATE TABLE transform.dnssec_combined (
+            CREATE TABLE staging.dnssec_combined (
                 date DATE,
                 dnssec_score DOUBLE,
                 country_code VARCHAR
             )
         """)
         conn.execute("""
-            CREATE TABLE transform.roa_combined (
+            CREATE TABLE staging.roa_combined (
                 date DATE,
                 roa_score DOUBLE,
                 country_code VARCHAR
             )
         """)
         conn.execute("""
-            CREATE TABLE transform.ipv6_combined (
+            CREATE TABLE staging.ipv6_combined (
                 date DATE,
                 ipv6_score DOUBLE,
                 country_code VARCHAR

@@ -1,5 +1,5 @@
 """@bruin
-name: transform.health_scoring
+name: marts.health_scoring
 type: python
 image: python:3.12
 connection: duckdb-default
@@ -8,7 +8,7 @@ materialization:
   strategy: create+replace
 
 depends:
-   - transform.country_rankings
+   - marts.country_rankings
 
 columns:
   - name: country_code
@@ -45,7 +45,7 @@ def materialize(**kwargs):
             (COALESCE(dnssec_score, 0) * 0.25) +
             (COALESCE(roa_score, 0) * 0.25)
         ) as health_score
-    FROM transform.country_rankings
+    FROM marts.country_rankings
     GROUP BY country_code
     ORDER BY health_score DESC
     """

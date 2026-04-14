@@ -26,10 +26,10 @@ DB_PATH = Path(__file__).parent.parent.parent / "data" / "internet_health.db"
 VALID_METRICS: frozenset[str] = frozenset({"ipv6", "https", "dnssec", "roa"})
 
 METRIC_TABLES: dict[str, str] = {
-    "ipv6": "transform.ipv6_combined",
-    "https": "transform.https_combined",
-    "dnssec": "transform.dnssec_combined",
-    "roa": "transform.roa_combined",
+    "ipv6": "staging.ipv6_combined",
+    "https": "staging.https_combined",
+    "dnssec": "staging.dnssec_combined",
+    "roa": "staging.roa_combined",
 }
 
 
@@ -76,7 +76,7 @@ def get_global_health_summary() -> pd.DataFrame:
                 (COALESCE(dnssec_score, 0) * 0.25) +
                 (COALESCE(roa_score, 0) * 0.25)
             ) as global_health_score
-        FROM transform.country_rankings
+        FROM marts.country_rankings
         """
         df = conn.execute(query).df()
     return df
@@ -105,7 +105,7 @@ def get_country_health_scores() -> pd.DataFrame:
             dnssec_score,
             roa_score,
             date
-        FROM transform.country_rankings
+        FROM marts.country_rankings
         ORDER BY health_score DESC
         """
         df = conn.execute(query).df()
@@ -119,7 +119,7 @@ def get_country_list() -> list[str]:
         A sorted list of ISO 3166-1 alpha-2 country codes.
     """
     with _db_connection() as conn:
-        query = "SELECT DISTINCT country_code FROM transform.country_rankings ORDER BY country_code"
+        query = "SELECT DISTINCT country_code FROM marts.country_rankings ORDER BY country_code"
         df = conn.execute(query).df()
     return df["country_code"].tolist()
 
@@ -178,7 +178,7 @@ def get_top_bottom_countries(n: int = 5) -> dict[str, list[dict[str, Any]]]:
     with _db_connection() as conn:
         query = """
         SELECT country_code, health_score
-        FROM transform.country_rankings
+        FROM marts.country_rankings
         ORDER BY health_score DESC
         """
         df = conn.execute(query).df()
@@ -202,7 +202,7 @@ def get_net_loss_data() -> pd.DataFrame:
     with _db_connection() as conn:
         query = """
         SELECT date, country, duration, shutdown__gdp, freedom_score
-        FROM transform.net_loss_combined
+        FROM staging.net_loss_combined
         ORDER BY date DESC, country
         """
         df = conn.execute(query).df()
@@ -226,7 +226,7 @@ def get_shutdown_summary() -> dict[str, Any]:
             AVG(duration) as avg_duration,
             SUM(shutdown__gdp) as total_gdp_impact,
             AVG(freedom_score) as avg_freedom_score
-        FROM transform.net_loss_combined
+        FROM staging.net_loss_combined
         """
         row = conn.execute(query).fetchone()
     if not row:
@@ -262,7 +262,7 @@ def get_shutdown_events() -> pd.DataFrame:
     with _db_connection() as conn:
         query = """
         SELECT date, country, duration, shutdown__gdp, freedom_score
-        FROM transform.net_loss_combined
+        FROM staging.net_loss_combined
         ORDER BY date DESC, country
         """
         df = conn.execute(query).df()
@@ -279,9 +279,7 @@ def get_last_updated() -> str:
     """
     try:
         with _db_connection() as conn:
-            result = conn.execute(
-                "SELECT MAX(date) FROM transform.internet_health_summary"
-            ).fetchone()
+            result = conn.execute("SELECT MAX(date) FROM marts.internet_health_summary").fetchone()
         if result and result[0]:
             return str(result[0])
     except (FileNotFoundError, Exception):

@@ -107,7 +107,7 @@ def test_health_score_sql_formula_against_test_db(duckdb_test_db):
             (COALESCE(dnssec_score, 0) * 0.25) +
             (COALESCE(roa_score, 0) * 0.25)
         ) as health_score
-    FROM transform.country_rankings
+    FROM marts.country_rankings
     GROUP BY country_code
     ORDER BY health_score DESC
     """
