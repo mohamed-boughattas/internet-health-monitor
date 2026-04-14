@@ -1,0 +1,20 @@
+name: raw.dnssec_validation_DE
+type: ingestr
+connection: duckdb-default
+
+materialization:
+  type: table
+  strategy: delete+insert
+  incremental_key: date
+
+columns:
+  - name: date
+    type: date
+    primary_key: true
+  - name: value
+    type: float
+
+parameters:
+  source_connection: isoc-pulse-default
+  source_table: "dnssec_validation:DE"
+  destination: duckdb

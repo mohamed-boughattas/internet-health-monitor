@@ -1,0 +1,21 @@
+name: raw.ipv6_JP
+type: ingestr
+connection: duckdb-default
+
+materialization:
+  type: table
+  strategy: delete+insert
+  incremental_key: date
+
+columns:
+  - name: date
+    type: date
+    primary_key: true
+  - name: value
+    type: float
+
+parameters:
+  source_connection: isoc-pulse-default
+  source_table: "ipv6:JP"
+  destination: duckdb
+

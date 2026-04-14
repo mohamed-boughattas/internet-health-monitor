@@ -1,0 +1,29 @@
+name: internet-health-monitor
+schedule: "@daily"
+start_date: "2024-01-01"
+
+default_connections:
+  duckdb: "duckdb-default"
+
+tags: [ "daily", "internet-health", "isoc-pulse" ]
+domains: [ "infrastructure", "security" ]
+owner: data-platform
+
+catchup: false
+concurrency: 4
+max_active_steps: 8
+
+default:
+  rerun_cooldown: 300
+
+variables:
+  countries:
+    type: array
+    items:
+      type: string
+    default:
+      - "US"
+      - "DE"
+      - "BR"
+      - "IN"
+      - "JP"
