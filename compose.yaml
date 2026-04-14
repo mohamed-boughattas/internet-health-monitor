@@ -1,0 +1,32 @@
+# Docker Compose for Internet Health Monitor
+# Usage:
+#   Start dashboard: docker compose up -d
+#   Stop services: docker compose down
+#   Rebuild: docker compose up --build -d
+
+services:
+  # -------------------------------------------------------------------------
+  # Dashboard service - runs the Dash web application
+  # -------------------------------------------------------------------------
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8050:8050"
+    environment:
+      ISOC_PULSE_TOKEN: ""
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8050/')\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - internet-health
+    restart: unless-stopped
+
+networks:
+  internet-health:
+    driver: bridge

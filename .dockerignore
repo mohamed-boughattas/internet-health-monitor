@@ -1,0 +1,63 @@
+# Git
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Build artifacts
+dist/
+build/
+*.whl
+
+# Database files
+*.db
+*.duckdb
+internet_health.db
+test_internet_health.db
+data/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# CI credentials
+# .bruin.yml is intentionally NOT excluded — it contains only env var references, no secrets
+
+# Environment
+.env
+.env.local
+
+# CI workflows (not needed in container)
+.github/
+
+# Documentation (not needed in container)
+README.md
+AGENTS.md
+LICENSE
