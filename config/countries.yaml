@@ -1,0 +1,103 @@
+# Single source of truth for tracked countries.
+# Used by: dashboard/constants.py, scripts/generate_assets.py
+#
+# To add a country:
+#   1. Edit this file manually, OR
+#   2. Run: just add-country CC
+#
+# After any change, run: just generate
+
+TRACKED_COUNTRIES:
+  US:
+    name: United States
+    iso_alpha3: USA
+  DE:
+    name: Germany
+    iso_alpha3: DEU
+  BR:
+    name: Brazil
+    iso_alpha3: BRA
+  IN:
+    name: India
+    iso_alpha3: IND
+  JP:
+    name: Japan
+    iso_alpha3: JPN
+  FR:
+    name: France
+    iso_alpha3: FRA
+  ES:
+    name: Spain
+    iso_alpha3: ESP
+  NL:
+    name: Netherlands
+    iso_alpha3: NLD
+  IT:
+    name: Italy
+    iso_alpha3: ITA
+  GB:
+    name: United Kingdom
+    iso_alpha3: GBR
+  CH:
+    name: Switzerland
+    iso_alpha3: CHE
+  BE:
+    name: Belgium
+    iso_alpha3: BEL
+  CA:
+    name: Canada
+    iso_alpha3: CAN
+  CN:
+    name: China
+    iso_alpha3: CHN
+  TN:
+    name: Tunisia
+    iso_alpha3: TUN
+  DZ:
+    name: Algeria
+    iso_alpha3: DZA
+  AU:
+    name: Australia
+    iso_alpha3: AUS
+  LU:
+    name: Luxembourg
+    iso_alpha3: LUX
+  ZA:
+    name: South Africa
+    iso_alpha3: ZAF
+  ID:
+    name: Indonesia
+    iso_alpha3: IDN
+  AE:
+    name: United Arab Emirates
+    iso_alpha3: ARE
+  SA:
+    name: Saudi Arabia
+    iso_alpha3: SAU
+  QA:
+    name: Qatar
+    iso_alpha3: QAT
+  SE:
+    name: Sweden
+    iso_alpha3: SWE
+  RU:
+    name: Russian Federation
+    iso_alpha3: RUS
+  FI:
+    name: Finland
+    iso_alpha3: FIN
+  "NO":
+    name: Norway
+    iso_alpha3: NOR
+  "MA":
+    name: Morocco
+    iso_alpha3: MAR
+  "PT":
+    name: Portugal
+    iso_alpha3: PRT
+  "DK":
+    name: Denmark
+    iso_alpha3: DNK
+  "HR":
+    name: Croatia
+    iso_alpha3: HRV
