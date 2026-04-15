@@ -4,21 +4,24 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 from dashboard.components import create_choropleth_map, create_kpi_card
-from dashboard.components.kpi_card import _score_to_color
+from dashboard.components.kpi_card import score_to_color
 from dashboard.data.queries import (
     get_country_health_scores,
     get_global_health_summary,
-    get_net_loss_data,
     get_top_bottom_countries,
 )
 
 
-def get_overview_layout():
-    """Get the overview page layout."""
+def get_overview_layout() -> dbc.Container | dbc.Alert:
+    """Get the overview page layout.
+
+    Returns:
+        A Dash Container with the overview UI, or an Alert if data is unavailable.
+    """
     try:
         summary = get_global_health_summary()
         country_scores = get_country_health_scores()
-    except (FileNotFoundError, Exception):
+    except Exception:
         return dbc.Alert(
             "Database not found. Please run the pipeline first with 'just run-pipeline'.",
             color="warning",
@@ -33,24 +36,15 @@ def get_overview_layout():
         )
 
     try:
-        net_loss = get_net_loss_data()
-    except (FileNotFoundError, Exception):
-        net_loss = None
-
-    try:
         top_bottom = get_top_bottom_countries(5)
-    except (FileNotFoundError, Exception):
+    except Exception:
         top_bottom = {"top": [], "bottom": []}
 
-    global_score = round(summary.iloc[0]["global_health_score"], 1) if len(summary) > 0 else 0
-    ipv6_score = round(summary.iloc[0]["ipv6_score"], 1) if len(summary) > 0 else 0
-    https_score = round(summary.iloc[0]["https_score"], 1) if len(summary) > 0 else 0
-    dnssec_score = round(summary.iloc[0]["dnssec_score"], 1) if len(summary) > 0 else 0
-    roa_score = round(summary.iloc[0]["roa_score"], 1) if len(summary) > 0 else 0
-
-    freedom_score = 100
-    if net_loss is not None and not net_loss.empty:
-        freedom_score = round(net_loss["freedom_score"].mean(), 1)
+    global_score = round(summary.iloc[0]["global_health_score"], 1)
+    ipv6_score = round(summary.iloc[0]["ipv6_score"], 1)
+    https_score = round(summary.iloc[0]["https_score"], 1)
+    dnssec_score = round(summary.iloc[0]["dnssec_score"], 1)
+    roa_score = round(summary.iloc[0]["roa_score"], 1)
 
     kpi_row_1 = dbc.Row(
         [
@@ -59,7 +53,7 @@ def get_overview_layout():
                     "Global Health Score",
                     f"{global_score}/100",
                     "Composite of 4 metrics",
-                    color=_score_to_color(global_score),
+                    color=score_to_color(global_score),
                 ),
                 md=3,
             ),
@@ -68,7 +62,7 @@ def get_overview_layout():
                     "IPv6 Adoption",
                     f"{ipv6_score}%",
                     "Protocol availability",
-                    color=_score_to_color(ipv6_score),
+                    color=score_to_color(ipv6_score),
                 ),
                 md=3,
             ),
@@ -77,7 +71,7 @@ def get_overview_layout():
                     "HTTPS Adoption",
                     f"{https_score}%",
                     "Encryption adoption",
-                    color=_score_to_color(https_score),
+                    color=score_to_color(https_score),
                 ),
                 md=3,
             ),
@@ -86,7 +80,7 @@ def get_overview_layout():
                     "DNSSEC Validation",
                     f"{dnssec_score}%",
                     "DNS security",
-                    color=_score_to_color(dnssec_score),
+                    color=score_to_color(dnssec_score),
                 ),
                 md=3,
             ),
@@ -101,18 +95,9 @@ def get_overview_layout():
                     "Routing Security (RPKI/ROA)",
                     f"{roa_score}%",
                     "BGP route protection",
-                    color=_score_to_color(roa_score),
+                    color=score_to_color(roa_score),
                 ),
-                md=4,
-            ),
-            dbc.Col(
-                create_kpi_card(
-                    "Internet Freedom",
-                    f"{freedom_score}%",
-                    "Based on shutdown data",
-                    color=_score_to_color(freedom_score),
-                ),
-                md=4,
+                md=6,
             ),
             dbc.Col(
                 create_kpi_card(
@@ -121,7 +106,7 @@ def get_overview_layout():
                     "In dataset",
                     color="dark",
                 ),
-                md=4,
+                md=6,
             ),
         ],
         className="mb-4",
@@ -155,7 +140,7 @@ def get_overview_layout():
                                     html.Span(f"{i + 1}. ", className="fw-bold text-success"),
                                     html.Span(
                                         f"{c['country_code']} - {c['health_score']:.1f}",
-                                        className=f"text-{_score_to_color(c['health_score'])}",
+                                        className=f"text-{score_to_color(c['health_score'])}",
                                     ),
                                 ]
                             )
@@ -180,7 +165,7 @@ def get_overview_layout():
                                     html.Span(f"{i + 1}. ", className="fw-bold text-danger"),
                                     html.Span(
                                         f"{c['country_code']} - {c['health_score']:.1f}",
-                                        className=f"text-{_score_to_color(c['health_score'])}",
+                                        className=f"text-{score_to_color(c['health_score'])}",
                                     ),
                                 ]
                             )

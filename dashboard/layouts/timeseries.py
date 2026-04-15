@@ -25,7 +25,7 @@ def get_timeseries_layout() -> dbc.Container | dbc.Alert:
     """
     try:
         country_list = get_country_list()
-    except (FileNotFoundError, Exception):
+    except Exception:
         return dbc.Alert(
             "Database not found. Please run the pipeline first with 'just run-pipeline'.",
             color="warning",
@@ -106,7 +106,7 @@ def get_timeseries_layout() -> dbc.Container | dbc.Alert:
                                         dcc.Dropdown(
                                             id="multi-country-selector",
                                             options=COUNTRY_OPTIONS,
-                                            value=["US", "DE", "IN"],
+                                            value=["US", "DE", "JP"],
                                             multi=True,
                                             placeholder="Select countries to compare",
                                             className="mb-3",
@@ -172,6 +172,18 @@ def create_timeseries_chart(df: pd.DataFrame, country_code: str, metric: str) ->
 
     fig.update_traces(mode="lines+markers")
     fig.update_layout(yaxis={"range": [0, 100]}, hovermode="x unified")
+
+    if metric == "ipv6":
+        fig.add_annotation(
+            text="Note: IPv6 data is monthly resolution",
+            xref="paper",
+            yref="paper",
+            x=0.5,
+            y=-0.15,
+            showarrow=False,
+            font={"size": 10, "color": "gray"},
+            align="center",
+        )
 
     return fig
 

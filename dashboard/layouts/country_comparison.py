@@ -25,7 +25,7 @@ def get_country_comparison_layout() -> dbc.Container | dbc.Alert:
     try:
         country_scores = get_country_health_scores()
         country_list = get_country_list()
-    except (FileNotFoundError, Exception):
+    except Exception:
         return dbc.Alert(
             "Database not found. Please run the pipeline first with 'just run-pipeline'.",
             color="warning",
@@ -233,7 +233,21 @@ def create_comparison_bar_chart(df: pd.DataFrame, countries: list[str]) -> go.Fi
         legend={"orientation": "h", "yanchor": "bottom", "y": 1.02, "xanchor": "right", "x": 1},
     )
 
-    fig.add_hline(y=50, line_dash="dash", line_color="gray", opacity=0.7)
-    fig.add_hline(y=80, line_dash="dash", line_color="green", opacity=0.7)
+    fig.add_hline(
+        y=50,
+        line_dash="dash",
+        line_color="gray",
+        opacity=0.7,
+        annotation_text="50%",
+        annotation_position="right",
+    )
+    fig.add_hline(
+        y=80,
+        line_dash="dash",
+        line_color="green",
+        opacity=0.7,
+        annotation_text="80% (Good)",
+        annotation_position="right",
+    )
 
     return fig

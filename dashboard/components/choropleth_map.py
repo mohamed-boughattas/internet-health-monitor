@@ -11,6 +11,8 @@ import plotly.graph_objects as go
 
 from dashboard.constants import ISO_ALPHA3, MAP_COUNTRY_CODES, TRACKED_COUNTRIES
 
+SMALL_COUNTRIES_ISO3 = {"JPN", "DEU"}
+
 
 def create_choropleth_map(
     df: pd.DataFrame,
@@ -69,12 +71,15 @@ def create_choropleth_map(
     )
 
     tracked_iso3 = df_map["iso_alpha3"].tolist()
-    tracked_labels = [
-        f"{row['country_name']}<br>{row[value_col]:.0f}"
-        if pd.notna(row.get(value_col))
-        else row["country_name"]
-        for _, row in df_map.iterrows()
-    ]
+    tracked_labels = []
+    for _, row in df_map.iterrows():
+        iso3 = row["iso_alpha3"]
+        if iso3 in SMALL_COUNTRIES_ISO3 or pd.isna(row.get(value_col)):
+            label = row["country_name"]
+        else:
+            label = f"{row['country_name']}<br>{row[value_col]:.0f}"
+        tracked_labels.append(label)
+
     fig.add_trace(
         go.Scattergeo(
             locations=tracked_iso3,

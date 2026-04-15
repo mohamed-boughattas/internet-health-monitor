@@ -16,7 +16,7 @@ import dash_bootstrap_components as dbc
 from dash import html
 
 
-def _score_to_color(score: float) -> str:
+def score_to_color(score: float) -> str:
     """Map a 0-100 score value to a Bootstrap color.
 
     Args:

@@ -12,7 +12,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from dash import dcc, html
 
-from dashboard.components.kpi_card import _score_to_color, create_kpi_card
+from dashboard.components.kpi_card import create_kpi_card, score_to_color
 from dashboard.constants import COUNTRY_OPTIONS, METRICS, TRACKED_COUNTRIES
 from dashboard.data.queries import get_country_health_scores
 
@@ -26,7 +26,7 @@ def get_metric_detail_layout() -> dbc.Container | dbc.Alert:
     """
     try:
         country_scores = get_country_health_scores()
-    except (FileNotFoundError, Exception):
+    except Exception:
         return dbc.Alert(
             "Database not found. Please run the pipeline first with 'just run-pipeline'.",
             color="warning",
@@ -111,7 +111,7 @@ def get_metric_detail_layout() -> dbc.Container | dbc.Alert:
                 [
                     dbc.Col(
                         [
-                            html.H4("Distribution", className="mb-3"),
+                            html.H4("Score Breakdown", className="mb-3"),
                             dcc.Loading(
                                 dcc.Graph(id="distribution-chart", style={"height": "350px"}),
                                 type="circle",
@@ -171,14 +171,17 @@ def create_metric_ranking(df: pd.DataFrame, metric: str) -> go.Figure | None:
 
 
 def create_distribution_chart(df: pd.DataFrame, metric: str) -> go.Figure | None:
-    """Create a distribution histogram for the metric.
+    """Create a score breakdown chart for the selected metric.
+
+    Displays each country's score as a horizontal bar for the chosen metric.
+    More meaningful than a histogram when tracking only 5 countries.
 
     Args:
         df: DataFrame containing country health scores.
         metric: Metric name to visualize.
 
     Returns:
-        A Plotly Figure object configured as a histogram,
+        A Plotly Figure object configured as a horizontal bar chart,
         or None if no valid data is available.
     """
     if df.empty:
@@ -189,22 +192,30 @@ def create_distribution_chart(df: pd.DataFrame, metric: str) -> go.Figure | None
     if score_col not in df.columns:
         return None
 
-    df_clean = df[df[score_col].notna()]
+    df_sorted = df.sort_values(score_col, ascending=True)
 
-    fig = px.histogram(
-        df_clean,
+    fig = px.bar(
+        df_sorted,
+        y="country_code",
         x=score_col,
-        nbins=20,
-        title=f"Distribution - {metric.upper()}",
-        labels={score_col: "Score", "count": "Count"},
+        orientation="h",
+        title=f"{metric.upper()} Score by Country",
+        labels={"country_code": "Country", score_col: "Score"},
+        color=score_col,
+        color_continuous_scale="RdYlGn",
+        range_x=[0, 100],
     )
 
-    fig.update_layout(xaxis={"range": [0, 100]}, showlegend=False)
+    fig.update_layout(
+        showlegend=False,
+        xaxis={"range": [0, 100]},
+        yaxis={"categoryorder": "total ascending"},
+    )
 
     return fig
 
 
-def build_country_detail_cards(df: pd.DataFrame, country_code: str) -> list:
+def build_country_detail_cards(df: pd.DataFrame, country_code: str) -> list[dbc.Col | dbc.Alert]:
     """Build KPI cards for a specific country's all metric scores.
 
     Args:
@@ -237,7 +248,7 @@ def build_country_detail_cards(df: pd.DataFrame, country_code: str) -> list:
                         label,
                         f"{score:.1f}%",
                         country_name,
-                        color=_score_to_color(score),
+                        color=score_to_color(score),
                     ),
                     md=3,
                 )

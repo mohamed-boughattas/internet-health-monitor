@@ -10,6 +10,10 @@ def create_navbar(last_updated: str = "N/A") -> dbc.Navbar:
     Args:
         last_updated: The date string of the last data update.
             Defaults to "N/A".
+
+    Returns:
+        A dbc.Navbar component with navigation links to all four
+        pages and a label showing the last data update time.
     """
     return dbc.Navbar(
         dbc.Container(
@@ -27,9 +31,6 @@ def create_navbar(last_updated: str = "N/A") -> dbc.Navbar:
                             dbc.NavItem(dbc.NavLink("Compare", href="/compare", active="exact")),
                             dbc.NavItem(dbc.NavLink("Trends", href="/trends", active="exact")),
                             dbc.NavItem(dbc.NavLink("Detail", href="/detail", active="exact")),
-                            dbc.NavItem(
-                                dbc.NavLink("Shutdowns", href="/shutdowns", active="exact")
-                            ),
                         ],
                         className="ms-auto",
                         navbar=True,
