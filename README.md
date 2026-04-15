@@ -1,31 +1,30 @@
 # Internet Health Monitor
 
-An interactive dashboard for visualizing internet health metrics for 5 countries (US, DE, BR, IN, JP), built with Bruin, DuckDB, and Dash.
+A data pipeline and interactive dashboard monitoring the security and accessibility of the internet. Ingests metrics from the Internet Society Pulse API, transforms them through a medallion architecture (Bronze/Silver/Gold), and visualizes trends in IPv6, HTTPS, DNSSEC, and RPKI adoption.
 
 ## Overview
 
-This project ingests internet health data from the [Internet Society Pulse API](https://pulse.internetsociety.org/) and transforms it into an interactive web dashboard. It covers 4 scored metrics plus internet shutdown data:
+This project ingests internet health data from the [Internet Society Pulse API](https://pulse.internetsociety.org/) and transforms it into an interactive web dashboard. It covers 4 scored metrics:
 
-| Metric                  | Description                                                 | Data Frequency |
-| ----------------------- | ----------------------------------------------------------- | -------------- |
-| **IPv6 Adoption**       | Percentage of users who can access the network via IPv6     | Monthly        |
-| **HTTPS Adoption**      | Percentage of web traffic using encrypted HTTPS connections | Daily          |
-| **DNSSEC Validation**   | Percentage of TLDs with valid DNSSEC                        | Daily          |
-| **ROA/RPKI**            | Route origin authorization coverage (IPv4 + IPv6 average)   | Daily          |
-| **Net Loss / Shutdown** | Internet shutdown events and GDP impact                     | Event-based    |
+| Metric                | Description                                               | Data Frequency |
+| -------------------- | --------------------------------------------------------- | -------------- |
+| **IPv6 Adoption**     | Percentage of users who can access the network via IPv6   | Monthly        |
+| **HTTPS Adoption**    | Percentage of web traffic using encrypted HTTPS connections | Daily        |
+| **DNSSEC Validation** | Percentage of TLDs with valid DNSSEC                      | Daily          |
+| **ROA/RPKI**          | Route origin authorization coverage (IPv4 + IPv6 average) | Daily        |
 
-The composite **Health Score** combines IPv6, HTTPS, DNSSEC, and ROA with equal 25% weights. Net loss data is displayed as "Internet Freedom" but is not part of the health score.
+The composite **Health Score** combines IPv6, HTTPS, DNSSEC, and ROA with equal 25% weights.
 
-The dashboard provides five views: global overview with choropleth map, country comparison charts, time-series trends, metric detail analysis, and a dedicated internet shutdowns page.
+The dashboard provides four views: global overview with choropleth map, country comparison charts, time-series trends, and metric detail analysis.
 
 ## Architecture
 
 ```mermaid
 graph LR
-    A["🌐 ISOC Pulse API"] -->|ingestr| B["🥉 Bronze (raw)<br/>30 ingestion tables"]
-    B -->|cleansed, UNIONed| C["🥈 Silver (staging)<br/>5 combined tables"]
+    A["🌐 ISOC Pulse API"] -->|ingestr| B["🥉 Bronze (raw)<br/>235 ingestion tables"]
+    B -->|cleansed, UNIONed| C["🥈 Silver (staging)<br/>4 combined tables"]
     C -->|monthly aggregation| D["🥇 Gold (marts)<br/>3 business tables"]
-    D -->|queries| E["📊 Dash Dashboard<br/>5 interactive pages"]
+    D -->|queries| E["📊 Dash Dashboard<br/>4 interactive pages"]
 
     subgraph DuckDB["DuckDB"]
         B
@@ -80,27 +79,25 @@ just docker-logs              # View container logs
 # Utilities
 just clean                    # Clean generated files
 just lock                     # Lock dependencies
+just generate                 # Regenerate pipeline assets from countries.yaml
+just add-country CC [CC ...] # Add countries + regenerate assets
+just remove-country CC [CC]  # Remove countries + regenerate assets
+just search-country QUERY     # Search countries by name
+just list-countries           # List all 249 ISO countries
+just list-tracked             # List tracked countries
+just check-drift              # CI drift check
 ```
 
 ## Countries
 
-Data is tracked for 5 countries (the only ones with data in the ISOC Pulse API):
-
-| Code | Country       |
-| ---- | ------------- |
-| US   | United States |
-| DE   | Germany       |
-| BR   | Brazil        |
-| IN   | India         |
-| JP   | Japan         |
+Data is tracked for 47 countries. See `config/countries.yaml` for the full list.
 
 ## Dashboard Pages
 
-1. **Overview** (`/`) — 7 KPI cards (Global Health, IPv6, HTTPS, DNSSEC, ROA/RPKI, Internet Freedom, Countries Tracked) + interactive choropleth map + country rankings; KPI cards auto-color by score threshold
+1. **Overview** (`/`) — 6 KPI cards (Global Health, IPv6, HTTPS, DNSSEC, ROA/RPKI, Countries Tracked) + interactive choropleth map + country rankings; KPI cards auto-color by score threshold
 2. **Compare** (`/compare`) — Radar chart (4-axis, filled), grouped bar chart (4 metrics), detailed metrics table (6 columns); reference lines at 50% and 80%
 3. **Trends** (`/trends`) — Single country trend + multi-country comparison; metric selector offers IPv6/HTTPS/DNSSEC/ROA-RPKI; **daily resolution preserved** for HTTPS/DNSSEC/ROA trend lines; CSV download available
 4. **Detail** (`/detail`) — Geographic map + country rankings + distribution; metric selector offers IPv6/HTTPS/DNSSEC/ROA-RPKI; reference line at 50%
-5. **Shutdowns** (`/shutdowns`) — KPI summary (total events, avg duration, GDP impact, avg freedom) + Gantt-style timeline + GDP impact chart + events table; CSV download available
 
 ## Configuration
 
@@ -165,15 +162,15 @@ just docker-build && just docker-up
 ## Testing
 
 ```bash
-just test              # Run all 138 tests
-just test-cov          # Run with coverage report (93%)
+just test              # Run all 114 tests
+just test-cov          # Run with coverage report
 ```
 
 | Test File | Tests | Coverage |
 |-----------|-------|----------|
 | `test_health_scoring.py` | Health score formula and SQL validation | `assets/enrichment/` |
 | `test_dashboard.py` | Components, constants, navbar, layouts | `dashboard/` |
-| `test_queries.py` | All 8 DuckDB query functions + edge cases | `dashboard/data/` |
+| `test_queries.py` | All 6 DuckDB query functions + edge cases | `dashboard/data/` |
 | `test_chart_functions.py` | Radar, bar, timeseries, distribution charts | `dashboard/layouts/` |
 | `test_layout_errors.py` | Layout error handling (mocked) | `dashboard/layouts/` |
 | `test_app.py` | Dash callbacks, routing, helpers | `dashboard/app.py` |
@@ -186,12 +183,4 @@ The composite health score is an equally-weighted average of 4 scored metrics:
 health_score = (ipv6_score × 0.25) + (https_score × 0.25) + (dnssec_score × 0.25) + (roa_score × 0.25)
 ```
 
-**Net loss / freedom_score is NOT part of the health score** — it is displayed as "Internet Freedom" on the Overview page only.
-
 All scores are on a 0-100 scale (percentage).
-
-## Known Limitations
-
-- **ISOC Pulse API only has data for 5 countries** (US, DE, BR, IN, JP). Other G20 countries return 0 rows.
-- **IPv6 is monthly while other metrics are daily** — IPv6 is the driving table in the summary JOIN. HTTPS, DNSSEC, and ROA are aggregated from daily to monthly via `DATE_TRUNC('month', date) + AVG()` in `internet_health_summary`. However, trend lines on the Trends page **preserve daily granularity** by querying the individual `*_combined` tables directly.
-- **Net loss data is event-based** — Internet shutdown events are sporadic and not part of the health score.
