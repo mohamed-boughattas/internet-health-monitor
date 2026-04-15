@@ -3,6 +3,8 @@
 # Load environment variables from .env file
 set dotenv-load
 
+start_date := "2026-03-01"
+
 # Show available commands
 help:
     @just --list
@@ -33,7 +35,7 @@ test-cov:
 
 # Run Bruin pipeline
 run-pipeline:
-    TELEMETRY_OPTOUT=true INGESTR_DISABLE_TELEMETRY=true bruin run .
+    TELEMETRY_OPTOUT=true INGESTR_DISABLE_TELEMETRY=true bruin run . --start-date {{ start_date }}
 
 # Validate Bruin pipeline
 validate:
@@ -53,9 +55,41 @@ clean:
     rm -rf .pytest_cache
     rm -rf htmlcov
     rm -f .coverage
-    rm -f internet_health.db
-    rm -f test_internet_health.db
+    rm -f data/internet_health.db
     @echo "Clean complete!"
+
+# Clean DuckDB database only
+clean-db:
+    rm -f data/internet_health.db
+    @echo "Database deleted!"
+
+# Regenerate all pipeline assets from dashboard/constants.py
+generate:
+    uv run python scripts/generate_assets.py
+
+# Add one or more countries then regenerate all pipeline assets
+add-country +CODES:
+    uv run python scripts/generate_assets.py --add {{ CODES }}
+
+# Remove one or more countries then regenerate pipeline assets
+remove-country +CODES:
+    uv run python scripts/generate_assets.py --remove {{ CODES }}
+
+# Search for a country by name (case-insensitive substring match)
+search-country QUERY:
+    uv run python scripts/countries.py search "{{ QUERY }}"
+
+# List all 249 ISO countries
+list-countries:
+    uv run python scripts/countries.py list
+
+# List all countries currently tracked in the pipeline
+list-tracked:
+    uv run python scripts/countries.py tracked
+
+# Check if generated files are in sync with constants (CI drift check)
+check-drift:
+    uv run python scripts/generate_assets.py --check
 
 # Lock dependencies
 lock:
@@ -77,6 +111,6 @@ docker-down:
 docker-logs:
     docker compose logs -f
 
-# CI check (install + lint + typecheck + format + test + validate)
-ci: install lint typecheck format test validate
+# CI check (install + lint + typecheck + format + test + validate + drift-check)
+ci: install lint typecheck format test validate check-drift
     @echo "CI checks passed!"
