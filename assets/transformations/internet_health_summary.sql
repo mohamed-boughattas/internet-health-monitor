@@ -7,7 +7,7 @@ materialization:
 depends:
  - staging.ipv6_combined
  - staging.https_combined
- - staging.dnssec_combined
+ - staging.dnssec_validation_combined
  - staging.roa_combined
 columns:
   - name: date
@@ -48,7 +48,7 @@ LEFT JOIN (
         DATE_TRUNC('month', date) AS date,
         country_code,
         AVG(dnssec_score) AS dnssec_score
-    FROM staging.dnssec_combined
+    FROM staging.dnssec_validation_combined
     GROUP BY DATE_TRUNC('month', date), country_code
 ) monthly_dnssec
     ON ipv6.date = monthly_dnssec.date

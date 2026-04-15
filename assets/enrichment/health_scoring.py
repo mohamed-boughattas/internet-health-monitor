@@ -27,9 +27,22 @@ columns:
 @bruin"""
 
 import duckdb
+import pandas as pd
 
 
-def materialize(**kwargs):
+def materialize(**kwargs: object) -> pd.DataFrame:
+    """Materialize the health_scoring table from DuckDB.
+
+    Computes per-country averages of all four metric scores and their
+    weighted composite health score (25% each).
+
+    Args:
+        kwargs: Keyword arguments passed by the Bruin pipeline (unused).
+
+    Returns:
+        A DataFrame with one row per country containing country_code,
+        ipv6_score, https_score, dnssec_score, roa_score, and health_score.
+    """
     conn = duckdb.connect("data/internet_health.db")
 
     query = """
