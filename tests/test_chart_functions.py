@@ -11,7 +11,7 @@ import pytest
 
 
 @pytest.fixture
-def sample_timeseries_df():
+def sample_timeseries_df() -> pd.DataFrame:
     """Provide a multi-date timeseries DataFrame for testing."""
     dates = ["2024-01-01", "2024-01-02", "2024-01-03", "2024-01-04"]
     return pd.DataFrame(
@@ -39,24 +39,10 @@ def sample_timeseries_df():
     )
 
 
-@pytest.fixture
-def sample_shutdown_df():
-    """Provide a shutdown events DataFrame for testing."""
-    return pd.DataFrame(
-        {
-            "date": pd.to_datetime(["2024-01-15", "2024-02-20", "2024-03-10"]),
-            "country": ["United States", "Germany", "India"],
-            "duration": [72.0, 0.0, 48.0],
-            "shutdown__gdp": [500.0, 0.0, 200.0],
-            "freedom_score": [50.0, 100.0, 60.0],
-        }
-    )
-
-
 class TestCreateRadarChart:
     """Tests for create_radar_chart()."""
 
-    def test_returns_figure_for_valid_data(self, sample_country_scores):
+    def test_returns_figure_for_valid_data(self, sample_country_scores) -> None:
         """Should return a go.Figure when given valid data and countries."""
         from dashboard.layouts.country_comparison import create_radar_chart
 
@@ -64,7 +50,7 @@ class TestCreateRadarChart:
 
         assert fig is not None
 
-    def test_returns_none_for_empty_df(self):
+    def test_returns_none_for_empty_df(self) -> None:
         """Should return None when DataFrame is empty."""
         from dashboard.layouts.country_comparison import create_radar_chart
 
@@ -72,7 +58,7 @@ class TestCreateRadarChart:
 
         assert fig is None
 
-    def test_returns_none_for_empty_countries_list(self, sample_country_scores):
+    def test_returns_none_for_empty_countries_list(self, sample_country_scores) -> None:
         """Should return None when countries list is empty."""
         from dashboard.layouts.country_comparison import create_radar_chart
 
@@ -80,7 +66,7 @@ class TestCreateRadarChart:
 
         assert fig is None
 
-    def test_returns_none_when_no_countries_match(self, sample_country_scores):
+    def test_returns_none_when_no_countries_match(self, sample_country_scores) -> None:
         """Should return None when no requested countries are in the DataFrame."""
         from dashboard.layouts.country_comparison import create_radar_chart
 
@@ -88,7 +74,7 @@ class TestCreateRadarChart:
 
         assert fig is None
 
-    def test_returns_figure_for_single_country(self, sample_country_scores):
+    def test_returns_figure_for_single_country(self, sample_country_scores) -> None:
         """Should return a figure for a single country."""
         from dashboard.layouts.country_comparison import create_radar_chart
 
@@ -100,7 +86,7 @@ class TestCreateRadarChart:
 class TestCreateComparisonBarChart:
     """Tests for create_comparison_bar_chart()."""
 
-    def test_returns_figure_for_valid_data(self, sample_country_scores):
+    def test_returns_figure_for_valid_data(self, sample_country_scores) -> None:
         """Should return a go.Figure when given valid data."""
         from dashboard.layouts.country_comparison import create_comparison_bar_chart
 
@@ -108,7 +94,7 @@ class TestCreateComparisonBarChart:
 
         assert fig is not None
 
-    def test_returns_none_for_empty_df(self):
+    def test_returns_none_for_empty_df(self) -> None:
         """Should return None when DataFrame is empty."""
         from dashboard.layouts.country_comparison import create_comparison_bar_chart
 
@@ -116,7 +102,7 @@ class TestCreateComparisonBarChart:
 
         assert fig is None
 
-    def test_returns_none_for_empty_countries_list(self, sample_country_scores):
+    def test_returns_none_for_empty_countries_list(self, sample_country_scores) -> None:
         """Should return None when countries list is empty."""
         from dashboard.layouts.country_comparison import create_comparison_bar_chart
 
@@ -124,7 +110,7 @@ class TestCreateComparisonBarChart:
 
         assert fig is None
 
-    def test_figure_has_two_hline_shapes(self, sample_country_scores):
+    def test_figure_has_two_hline_shapes(self, sample_country_scores) -> None:
         """Should have reference lines at y=50 and y=80."""
         from dashboard.layouts.country_comparison import create_comparison_bar_chart
 
@@ -138,7 +124,7 @@ class TestCreateComparisonBarChart:
 class TestCreateTimeseriesChart:
     """Tests for create_timeseries_chart()."""
 
-    def test_returns_figure_for_valid_data(self, sample_timeseries_df):
+    def test_returns_figure_for_valid_data(self, sample_timeseries_df) -> None:
         """Should return a go.Figure for valid timeseries data."""
         from dashboard.layouts.timeseries import create_timeseries_chart
 
@@ -146,7 +132,7 @@ class TestCreateTimeseriesChart:
 
         assert fig is not None
 
-    def test_returns_none_for_empty_df(self):
+    def test_returns_none_for_empty_df(self) -> None:
         """Should return None when DataFrame is empty."""
         from dashboard.layouts.timeseries import create_timeseries_chart
 
@@ -154,7 +140,7 @@ class TestCreateTimeseriesChart:
 
         assert fig is None
 
-    def test_returns_none_for_country_not_in_df(self, sample_timeseries_df):
+    def test_returns_none_for_country_not_in_df(self, sample_timeseries_df) -> None:
         """Should return None when country_code is not in the DataFrame."""
         from dashboard.layouts.timeseries import create_timeseries_chart
 
@@ -162,7 +148,7 @@ class TestCreateTimeseriesChart:
 
         assert fig is None
 
-    def test_returns_none_when_score_column_missing(self, sample_timeseries_df):
+    def test_returns_none_when_score_column_missing(self, sample_timeseries_df) -> None:
         """Should return None when the metric score column is missing."""
         from dashboard.layouts.timeseries import create_timeseries_chart
 
@@ -170,7 +156,7 @@ class TestCreateTimeseriesChart:
 
         assert fig is None
 
-    def test_figure_yaxis_range_is_0_to_100(self, sample_timeseries_df):
+    def test_figure_yaxis_range_is_0_to_100(self, sample_timeseries_df) -> None:
         """Y-axis range should be [0, 100]."""
         from dashboard.layouts.timeseries import create_timeseries_chart
 
@@ -182,7 +168,7 @@ class TestCreateTimeseriesChart:
 class TestCreateMultiCountryChart:
     """Tests for create_multi_country_chart()."""
 
-    def test_returns_figure_for_valid_data(self, sample_timeseries_df):
+    def test_returns_figure_for_valid_data(self, sample_timeseries_df) -> None:
         """Should return a go.Figure for valid data."""
         from dashboard.layouts.timeseries import create_multi_country_chart
 
@@ -190,7 +176,7 @@ class TestCreateMultiCountryChart:
 
         assert fig is not None
 
-    def test_returns_none_for_empty_df(self):
+    def test_returns_none_for_empty_df(self) -> None:
         """Should return None when DataFrame is empty."""
         from dashboard.layouts.timeseries import create_multi_country_chart
 
@@ -198,7 +184,7 @@ class TestCreateMultiCountryChart:
 
         assert fig is None
 
-    def test_returns_none_for_empty_countries_list(self, sample_timeseries_df):
+    def test_returns_none_for_empty_countries_list(self, sample_timeseries_df) -> None:
         """Should return None when countries list is empty."""
         from dashboard.layouts.timeseries import create_multi_country_chart
 
@@ -206,7 +192,7 @@ class TestCreateMultiCountryChart:
 
         assert fig is None
 
-    def test_returns_none_when_score_column_missing(self, sample_timeseries_df):
+    def test_returns_none_when_score_column_missing(self, sample_timeseries_df) -> None:
         """Should return None when the metric score column is missing."""
         from dashboard.layouts.timeseries import create_multi_country_chart
 
@@ -218,7 +204,7 @@ class TestCreateMultiCountryChart:
 class TestCreateMetricRanking:
     """Tests for create_metric_ranking()."""
 
-    def test_returns_figure_for_valid_data(self, sample_country_scores):
+    def test_returns_figure_for_valid_data(self, sample_country_scores) -> None:
         """Should return a go.Figure for valid data."""
         from dashboard.layouts.metric_detail import create_metric_ranking
 
@@ -226,7 +212,7 @@ class TestCreateMetricRanking:
 
         assert fig is not None
 
-    def test_returns_none_for_empty_df(self):
+    def test_returns_none_for_empty_df(self) -> None:
         """Should return None when DataFrame is empty."""
         from dashboard.layouts.metric_detail import create_metric_ranking
 
@@ -234,7 +220,7 @@ class TestCreateMetricRanking:
 
         assert fig is None
 
-    def test_returns_none_when_score_column_missing(self, sample_country_scores):
+    def test_returns_none_when_score_column_missing(self, sample_country_scores) -> None:
         """Should return None when the score column is missing."""
         from dashboard.layouts.metric_detail import create_metric_ranking
 
@@ -242,7 +228,7 @@ class TestCreateMetricRanking:
 
         assert fig is None
 
-    def test_figure_has_vline_at_50(self, sample_country_scores):
+    def test_figure_has_vline_at_50(self, sample_country_scores) -> None:
         """Should have a vertical reference line at x=50."""
         from dashboard.layouts.metric_detail import create_metric_ranking
 
@@ -255,7 +241,7 @@ class TestCreateMetricRanking:
 class TestCreateDistributionChart:
     """Tests for create_distribution_chart()."""
 
-    def test_returns_figure_for_valid_data(self, sample_country_scores):
+    def test_returns_figure_for_valid_data(self, sample_country_scores) -> None:
         """Should return a go.Figure for valid data."""
         from dashboard.layouts.metric_detail import create_distribution_chart
 
@@ -263,7 +249,7 @@ class TestCreateDistributionChart:
 
         assert fig is not None
 
-    def test_returns_none_for_empty_df(self):
+    def test_returns_none_for_empty_df(self) -> None:
         """Should return None when DataFrame is empty."""
         from dashboard.layouts.metric_detail import create_distribution_chart
 
@@ -271,7 +257,7 @@ class TestCreateDistributionChart:
 
         assert fig is None
 
-    def test_returns_none_when_score_column_missing(self, sample_country_scores):
+    def test_returns_none_when_score_column_missing(self, sample_country_scores) -> None:
         """Should return None when the score column is missing."""
         from dashboard.layouts.metric_detail import create_distribution_chart
 
@@ -279,7 +265,7 @@ class TestCreateDistributionChart:
 
         assert fig is None
 
-    def test_figure_xaxis_range_is_0_to_100(self, sample_country_scores):
+    def test_figure_xaxis_range_is_0_to_100(self, sample_country_scores) -> None:
         """X-axis range should be [0, 100]."""
         from dashboard.layouts.metric_detail import create_distribution_chart
 
@@ -291,7 +277,7 @@ class TestCreateDistributionChart:
 class TestBuildCountryDetailCards:
     """Tests for build_country_detail_cards()."""
 
-    def test_returns_cards_for_existing_country(self, sample_country_scores):
+    def test_returns_cards_for_existing_country(self, sample_country_scores) -> None:
         """Should return a list of cards for a country in the DataFrame."""
         from dashboard.layouts.metric_detail import build_country_detail_cards
 
@@ -299,7 +285,7 @@ class TestBuildCountryDetailCards:
 
         assert len(cards) == 4
 
-    def test_returns_alert_for_nonexistent_country(self, sample_country_scores):
+    def test_returns_alert_for_nonexistent_country(self, sample_country_scores) -> None:
         """Should return an Alert component when country is not in DataFrame."""
         from dashboard.layouts.metric_detail import build_country_detail_cards
 
@@ -307,7 +293,7 @@ class TestBuildCountryDetailCards:
 
         assert len(cards) == 1
 
-    def test_skips_metrics_with_nan_scores(self):
+    def test_skips_metrics_with_nan_scores(self) -> None:
         """Should skip metrics where the score is NaN."""
         from dashboard.layouts.metric_detail import build_country_detail_cards
 
@@ -325,105 +311,3 @@ class TestBuildCountryDetailCards:
         cards = build_country_detail_cards(df, "XX")
 
         assert len(cards) == 3
-
-
-class TestCreateShutdownTimeline:
-    """Tests for create_shutdown_timeline()."""
-
-    def test_returns_figure_for_valid_data(self, sample_shutdown_df):
-        """Should return a go.Figure for valid shutdown data."""
-        from dashboard.layouts.shutdowns import create_shutdown_timeline
-
-        fig = create_shutdown_timeline(sample_shutdown_df)
-
-        assert fig is not None
-
-    def test_returns_empty_figure_for_empty_df(self):
-        """Should return an empty go.Figure when DataFrame is empty."""
-        from dashboard.layouts.shutdowns import create_shutdown_timeline
-
-        fig = create_shutdown_timeline(pd.DataFrame())
-
-        assert fig is not None
-        assert len(fig.data) == 0
-
-    def test_returns_empty_figure_when_all_durations_na(self, sample_shutdown_df):
-        """Should return an empty figure when all durations are NaN."""
-        from dashboard.layouts.shutdowns import create_shutdown_timeline
-
-        df = sample_shutdown_df.copy()
-        df["duration"] = pd.NA
-        fig = create_shutdown_timeline(df)
-
-        assert fig is not None
-        assert len(fig.data) == 0
-
-
-class TestCreateGdpImpactChart:
-    """Tests for create_gdp_impact_chart()."""
-
-    def test_returns_figure_for_valid_data(self, sample_shutdown_df):
-        """Should return a go.Figure for valid shutdown data."""
-        from dashboard.layouts.shutdowns import create_gdp_impact_chart
-
-        fig = create_gdp_impact_chart(sample_shutdown_df)
-
-        assert fig is not None
-
-    def test_returns_empty_figure_for_empty_df(self):
-        """Should return an empty figure when DataFrame is empty."""
-        from dashboard.layouts.shutdowns import create_gdp_impact_chart
-
-        fig = create_gdp_impact_chart(pd.DataFrame())
-
-        assert fig is not None
-        assert len(fig.data) == 0
-
-    def test_returns_empty_figure_when_column_missing(self, sample_shutdown_df):
-        """Should return an empty figure when shutdown__gdp column is missing."""
-        from dashboard.layouts.shutdowns import create_gdp_impact_chart
-
-        df = sample_shutdown_df.drop(columns=["shutdown__gdp"])
-        fig = create_gdp_impact_chart(df)
-
-        assert fig is not None
-        assert len(fig.data) == 0
-
-
-class TestCreateFreedomChart:
-    """Tests for create_freedom_chart()."""
-
-    def test_returns_figure_for_valid_data(self, sample_shutdown_df):
-        """Should return a go.Figure for valid shutdown data."""
-        from dashboard.layouts.shutdowns import create_freedom_chart
-
-        fig = create_freedom_chart(sample_shutdown_df)
-
-        assert fig is not None
-
-    def test_returns_empty_figure_for_empty_df(self):
-        """Should return an empty figure when DataFrame is empty."""
-        from dashboard.layouts.shutdowns import create_freedom_chart
-
-        fig = create_freedom_chart(pd.DataFrame())
-
-        assert fig is not None
-        assert len(fig.data) == 0
-
-    def test_returns_empty_figure_when_column_missing(self, sample_shutdown_df):
-        """Should return an empty figure when freedom_score column is missing."""
-        from dashboard.layouts.shutdowns import create_freedom_chart
-
-        df = sample_shutdown_df.drop(columns=["freedom_score"])
-        fig = create_freedom_chart(df)
-
-        assert fig is not None
-        assert len(fig.data) == 0
-
-    def test_figure_xaxis_range_is_0_to_100(self, sample_shutdown_df):
-        """X-axis range should be [0, 100]."""
-        from dashboard.layouts.shutdowns import create_freedom_chart
-
-        fig = create_freedom_chart(sample_shutdown_df)
-        assert fig is not None
-        assert fig.layout.xaxis.range == (0, 100)

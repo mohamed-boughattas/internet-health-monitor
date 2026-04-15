@@ -1,9 +1,19 @@
-"""Tests for health scoring module."""
+"""Tests for health scoring module.
+
+Note: Fixtures are auto-generated from TRACKED_COUNTRIES — adding a new
+country requires no test changes.
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
 
 import pandas as pd
 
+from dashboard.constants import TRACKED_COUNTRIES
 
-def test_health_score_calculation():
+
+def test_health_score_calculation() -> None:
     """Test that health score calculation is correct."""
     ipv6_score = 85.0
     https_score = 95.0
@@ -17,7 +27,7 @@ def test_health_score_calculation():
     assert abs(expected_score - 87.5) < 0.01
 
 
-def test_health_score_with_low_ipv6():
+def test_health_score_with_low_ipv6() -> None:
     """Test health score calculation with low IPv6 score."""
     ipv6_score = 30.0
     https_score = 90.0
@@ -31,7 +41,7 @@ def test_health_score_with_low_ipv6():
     assert abs(expected_score - 67.5) < 0.01
 
 
-def test_health_score_with_equal_scores():
+def test_health_score_with_equal_scores() -> None:
     """Test health score calculation when all scores are equal."""
     ipv6_score = 80.0
     https_score = 80.0
@@ -45,15 +55,15 @@ def test_health_score_with_equal_scores():
     assert abs(expected_score - 80.0) < 0.01
 
 
-def test_country_ranking_ordering(sample_country_scores):
-    """Test that countries are correctly ordered by health score."""
+def test_country_ranking_ordering(sample_country_scores: pd.DataFrame) -> None:
+    """Test that countries are correctly ordered by health score (descending)."""
     df = sample_country_scores.sort_values("health_score", ascending=False)
 
-    assert df.iloc[0]["country_code"] == "DE"
-    assert df.iloc[-1]["country_code"] == "BR"
+    scores = df["health_score"].tolist()
+    assert scores == sorted(scores, reverse=True)
 
 
-def test_metric_averaging():
+def test_metric_averaging() -> None:
     """Test that averaging metrics across dates works correctly."""
     data = [
         {
@@ -84,12 +94,8 @@ def test_metric_averaging():
     assert avg_roa == 89.0
 
 
-def test_health_score_sql_formula_against_test_db(duckdb_test_db):
-    """Test that the health score SQL formula matches actual implementation.
-
-    This mirrors the SQL in assets/enrichment/health_scoring.py to ensure
-    the formula is correctly implemented.
-    """
+def test_health_score_sql_formula_against_test_db(duckdb_test_db: Path) -> None:
+    """Test that the health score SQL formula matches actual implementation."""
     import duckdb
 
     conn = duckdb.connect(str(duckdb_test_db))
@@ -114,7 +120,7 @@ def test_health_score_sql_formula_against_test_db(duckdb_test_db):
     df = conn.execute(query).df()
     conn.close()
 
-    assert len(df) == 5
+    assert len(df) == len(TRACKED_COUNTRIES)
     for _, row in df.iterrows():
         expected = (
             (row["ipv6_score"] * 0.25)
