@@ -63,7 +63,7 @@ clean-db:
     rm -f data/internet_health.db
     @echo "Database deleted!"
 
-# Regenerate all pipeline assets from dashboard/constants.py
+# Regenerate all pipeline assets from countries.yaml
 generate:
     uv run python scripts/generate_assets.py
 
