@@ -14,8 +14,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8050:8050"
-    environment:
-      ISOC_PULSE_TOKEN: ""
     volumes:
       - ./data:/app/data
     healthcheck:
