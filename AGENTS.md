@@ -13,7 +13,7 @@ To add/remove countries:
 ```bash
 just add-country CC [CC ...]    # adds to countries.yaml + regenerates everything
 just remove-country CC [CC]     # removes + regenerates
-just check-drift                # CI check: exits 1 if generated files are stale
+just check-drift                # CI check: validates ingestion assets only (not pipeline.yml or conftest.py)
 ```
 
 ## Commands
