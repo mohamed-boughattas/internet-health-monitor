@@ -26,19 +26,11 @@ ENV/
 .pytest_cache/
 .coverage
 htmlcov/
-.tox/
 
 # Build artifacts
 dist/
 build/
 *.whl
-
-# Database files
-*.db
-*.duckdb
-internet_health.db
-test_internet_health.db
-data/
 
 # Logs
 *.log
