@@ -19,19 +19,7 @@ The dashboard provides four views: global overview with choropleth map, country 
 
 ## Architecture
 
-```mermaid
-graph LR
-    A["🌐 ISOC Pulse API"] -->|ingestr| B["🥉 Bronze (raw)<br/>235 ingestion tables"]
-    B -->|cleansed, UNIONed| C["🥈 Silver (staging)<br/>4 combined tables"]
-    C -->|monthly aggregation| D["🥇 Gold (marts)<br/>3 business tables"]
-    D -->|queries| E["📊 Dash Dashboard<br/>4 interactive pages"]
-
-    subgraph DuckDB["DuckDB"]
-        B
-        C
-        D
-    end
-```
+![Architecture](docs/images/architecture.png)
 
 ## Tech Stack
 
@@ -78,7 +66,8 @@ just docker-logs              # View container logs
 
 # Utilities
 just clean                    # Clean generated files
-just lock                     # Lock dependencies
+just clean-db                 # Delete data/internet_health.db
+just lock                     # Lock dependencies (commit uv.lock after changes to pyproject.toml)
 just generate                 # Regenerate pipeline assets from countries.yaml
 just add-country CC [CC ...] # Add countries + regenerate assets
 just remove-country CC [CC]  # Remove countries + regenerate assets
@@ -90,7 +79,7 @@ just check-drift              # CI drift check
 
 ## Countries
 
-Data is tracked for 47 countries. See `config/countries.yaml` for the full list.
+Data is tracked for 31 countries. See `config/countries.yaml` for the full list.
 
 ## Dashboard Pages
 
