@@ -37,13 +37,8 @@ jobs:
       - name: Run pytest
         run: uv run pytest tests/ -v
 
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: htmlcov/
-          retention-days: 7
+      - name: Check drift
+        run: uv run python scripts/generate_assets.py --check
 
   bruin-validate:
     runs-on: ubuntu-latest
