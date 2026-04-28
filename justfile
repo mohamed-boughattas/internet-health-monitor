@@ -11,7 +11,7 @@ help:
 
 # Install dependencies (including dev tools)
 install:
-    uv sync --extra dev
+    uv sync --group dev
 
 # Run linter
 lint:
@@ -23,7 +23,7 @@ format:
 
 # Run type checker
 typecheck:
-    uv run ty check dashboard/ tests/ assets/enrichment/
+    uv run pyrefly check dashboard/ tests/ assets/enrichment/
 
 # Run tests
 test:
