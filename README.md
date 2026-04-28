@@ -30,7 +30,7 @@ The dashboard provides four views: global overview with choropleth map, country 
 | Language           | Python           | 3.12                |
 | Package Manager    | uv               | latest              |
 | Linter/Formatter   | ruff             | >=0.3.0             |
-| Type Checker       | ty               | >=0.0.29            |
+| Type Checker       | pyrefly          | >=0.63.0            |
 | Dashboard          | Dash + Plotly    | >=2.14.0 / >=5.18.0 |
 | Task Runner        | just             | latest              |
 | Testing            | pytest           | >=7.4.0             |
@@ -46,7 +46,7 @@ just setup                    # Install deps + validate pipeline
 just install                  # Install dependencies
 just lint                     # Run ruff linter
 just format                   # Run ruff formatter
-just typecheck                # Run ty type checker
+just typecheck                # Run pyrefly type checker
 just test                     # Run pytest
 just test-cov                 # Run pytest with coverage
 just ci                       # Run all CI checks
