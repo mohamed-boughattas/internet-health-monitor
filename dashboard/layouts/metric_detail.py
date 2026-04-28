@@ -254,4 +254,4 @@ def build_country_detail_cards(df: pd.DataFrame, country_code: str) -> list[dbc.
                 )
             )
 
-    return cards
+    return cards  # pyrefly: ignore[bad-return]

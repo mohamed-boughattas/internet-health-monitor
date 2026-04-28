@@ -116,7 +116,7 @@ class TestCreateComparisonBarChart:
 
         fig = create_comparison_bar_chart(sample_country_scores, ["US", "DE"])
         assert fig is not None
-        shapes = [s for s in fig.layout.shapes if s.y0 is not None]
+        shapes = [s for s in fig.layout.shapes if s.y0 is not None]  # pyrefly: ignore[missing-attribute]
         hlines = [s for s in shapes if s.y0 == s.y1 and isinstance(s.y0, (int, float))]
         assert len(hlines) >= 2
 
@@ -162,7 +162,7 @@ class TestCreateTimeseriesChart:
 
         fig = create_timeseries_chart(sample_timeseries_df, "US", "https")
         assert fig is not None
-        assert fig.layout.yaxis.range == (0, 100)
+        assert fig.layout.yaxis.range == (0, 100)  # pyrefly: ignore[missing-attribute]
 
 
 class TestCreateMultiCountryChart:
@@ -234,7 +234,7 @@ class TestCreateMetricRanking:
 
         fig = create_metric_ranking(sample_country_scores, "https")
         assert fig is not None
-        vlines = [s for s in fig.layout.shapes if hasattr(s, "x0") and s.x0 == 50]
+        vlines = [s for s in fig.layout.shapes if hasattr(s, "x0") and s.x0 == 50]  # pyrefly: ignore[missing-attribute]
         assert len(vlines) >= 1
 
 
@@ -271,7 +271,7 @@ class TestCreateDistributionChart:
 
         fig = create_distribution_chart(sample_country_scores, "https")
         assert fig is not None
-        assert fig.layout.xaxis.range == (0, 100)
+        assert fig.layout.xaxis.range == (0, 100)  # pyrefly: ignore[missing-attribute]
 
 
 class TestBuildCountryDetailCards:

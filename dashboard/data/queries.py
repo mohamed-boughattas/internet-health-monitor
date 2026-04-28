@@ -200,7 +200,7 @@ def get_top_bottom_countries(n: int = 5) -> dict[str, list[dict[str, Any]]]:
         ORDER BY health_score DESC
         """
         df = conn.execute(query).df()
-    return {
+    return {  # pyrefly: ignore[bad-return]
         "top": df.head(n).to_dict("records"),
         "bottom": df.tail(n).to_dict("records"),
     }

@@ -26,7 +26,7 @@ class TestErrorFigure:
 
         fig = _error_figure()
 
-        annotations = fig.layout.annotations
+        annotations = fig.layout.annotations  # pyrefly: ignore[missing-attribute]
         assert len(annotations) == 1
         assert annotations[0].text == "Error loading data"
 
@@ -36,7 +36,7 @@ class TestErrorFigure:
 
         fig = _error_figure("Custom error message")
 
-        annotations = fig.layout.annotations
+        annotations = fig.layout.annotations  # pyrefly: ignore[missing-attribute]
         assert len(annotations) == 1
         assert annotations[0].text == "Custom error message"
 
@@ -46,8 +46,8 @@ class TestErrorFigure:
 
         fig = _error_figure()
 
-        assert fig.layout.xaxis.visible is False
-        assert fig.layout.yaxis.visible is False
+        assert fig.layout.xaxis.visible is False  # pyrefly: ignore[missing-attribute]
+        assert fig.layout.yaxis.visible is False  # pyrefly: ignore[missing-attribute]
 
     def test_has_white_plot_background(self) -> None:
         """Should have white plot background."""
@@ -55,7 +55,7 @@ class TestErrorFigure:
 
         fig = _error_figure()
 
-        assert fig.layout.plot_bgcolor == "white"
+        assert fig.layout.plot_bgcolor == "white"  # pyrefly: ignore[missing-attribute]
 
 
 class TestDisplayPage:
