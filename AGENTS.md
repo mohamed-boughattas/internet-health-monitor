@@ -26,6 +26,7 @@ just run-pipeline    # run Bruin pipeline (requires ISOC_PULSE_TOKEN)
 just clean-db        # delete data/internet_health.db
 just test-cov        # pytest with coverage (covers dashboard/ package)
 just docker-up       # start dashboard in Docker (detached)
+just lock            # uv lock (commit uv.lock after pyproject.toml changes)
 ```
 
 ## CI checks — order and scope
@@ -76,6 +77,7 @@ Key pipeline logic that's not obvious from filenames:
 - **`just run-pipeline`** uses `start_date := "2026-03-01"` from the justfile, which may differ from `start_date` in `pipeline.yml`.
 - **`health_scoring.py`** hardcodes `duckdb.connect("data/internet_health.db")` — relative to project root.
 - **`uv.lock`** is committed to git — run `uv lock` after any dependency change in `pyproject.toml`.
+- **`.bruin.yml` is gitignored** — connection config maps `ISOC_PULSE_TOKEN` to DuckDB via env var interpolation; changes to it are not tracked by git.
 
 ## Code style
 
